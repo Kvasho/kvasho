@@ -9,6 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { useCurtain, type CurtainOptions } from "@/components/curtain";
+import { useWorkBackdrop } from "@/components/work-backdrop";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -42,6 +43,7 @@ export default function WorkCard({
   glowContrast,
 }: WorkCardProps) {
   const navigate = useCurtain();
+  const backdrop = useWorkBackdrop();
   const card = useRef<HTMLElement>(null);
   const rotateX = useRef<gsap.QuickToFunc>(null);
   const rotateY = useRef<gsap.QuickToFunc>(null);
@@ -72,9 +74,17 @@ export default function WorkCard({
     rotateY.current?.((x - 0.5) * MAX_TILT * 2);
   }
 
+  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
+    // Hovering spreads the card's illustration across the page behind it.
+    if (art && event.pointerType === "mouse") {
+      backdrop.show({ id: index, art, glow });
+    }
+  }
+
   function handlePointerLeave() {
     rotateX.current?.(0);
     rotateY.current?.(0);
+    backdrop.hide();
   }
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
@@ -85,12 +95,14 @@ export default function WorkCard({
     }
 
     event.preventDefault();
+    backdrop.hide();
     navigate(href, curtain);
   }
 
   return (
     <article
       ref={card}
+      onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       // Overriding --accent recolours every accent utility inside the card.
