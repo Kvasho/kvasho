@@ -19,8 +19,13 @@ export type CurtainOptions = {
   label: string;
   /** Curtain colour; the site accent when left out. */
   color?: string;
-  /** A short muted clip played behind the label, tinted with the colour. */
-  video?: { src: string; poster?: string };
+  /** Colour of the label; white when left out. */
+  textColor?: string;
+  /**
+   * A short muted clip played behind the label. `tint` is how strongly the
+   * curtain colour is laid over it, from 0 (none) to 1 (solid); 0.6 by default.
+   */
+  video?: { src: string; poster?: string; tint?: number };
 };
 
 type Transition = CurtainOptions & { href: string };
@@ -109,7 +114,7 @@ export default function CurtainProvider({ children }: { children: ReactNode }) {
         <div
           ref={curtain}
           aria-hidden
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: color, color: transition.textColor }}
           className="fixed inset-0 z-60 flex items-center justify-center overflow-hidden text-white"
         >
           {transition.video && (
@@ -126,7 +131,8 @@ export default function CurtainProvider({ children }: { children: ReactNode }) {
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundColor: `color-mix(in srgb, ${color} 60%, transparent)`,
+                  backgroundColor: color,
+                  opacity: transition.video.tint ?? 0.6,
                 }}
               />
             </>

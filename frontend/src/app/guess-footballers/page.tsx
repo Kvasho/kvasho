@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Game from "./game";
 import Pitch from "./pitch";
-import PitchTheme from "./pitch-theme";
+import PageTheme from "@/components/page-theme";
 
 export const metadata: Metadata = {
   title: "Guess Footballers — KVASHO",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function GuessFootballers() {
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-20 sm:px-10">
-      <PitchTheme />
+      <PageTheme name="pitch" />
       <div aria-hidden className="pitch-backdrop">
         <Pitch cover className="size-full" />
       </div>

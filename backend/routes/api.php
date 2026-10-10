@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\GeoGameController;
+use App\Http\Controllers\Api\V1\GeoGameGuessController;
 use App\Http\Controllers\Api\V1\LineupGuessController;
 use App\Http\Controllers\Api\V1\MatchController;
 use App\Http\Controllers\Api\V1\MatchLineupController;
@@ -18,4 +20,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         ->scopeBindings()
         ->name('matches.lineups.guesses.store');
     Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+
+    Route::post('/geo/games', [GeoGameController::class, 'store'])->name('geo.games.store');
+    Route::get('/geo/games/{game:token}', [GeoGameController::class, 'show'])->name('geo.games.show');
+    Route::post('/geo/games/{game:token}/guess', [GeoGameGuessController::class, 'store'])->name('geo.games.guess');
 });
