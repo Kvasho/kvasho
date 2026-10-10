@@ -8,7 +8,17 @@ gsap.registerPlugin(useGSAP);
 
 const PARTICLE_COUNT = 48;
 
+function readColors() {
+  const style = getComputedStyle(document.documentElement);
+
+  return {
+    dot: style.getPropertyValue("--foreground").trim(),
+    spark: style.getPropertyValue("--bg-spark").trim(),
+  };
+}
+
 export default function BackgroundFx() {
+  const colors = useRef({ dot: "", spark: "" });
   const canvas = useRef<HTMLCanvasElement>(null);
   const glow = useRef<HTMLDivElement>(null);
 
@@ -51,16 +61,8 @@ export default function BackgroundFx() {
 
     let width = 0;
     let height = 0;
-    let foreground = "";
-    let accent = "";
     let frame = 0;
     let last = performance.now();
-
-    function readColors() {
-      const style = getComputedStyle(document.documentElement);
-      foreground = style.getPropertyValue("--foreground").trim();
-      accent = style.getPropertyValue("--accent").trim();
-    }
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio, 2);
@@ -85,7 +87,7 @@ export default function BackgroundFx() {
 
         const twinkle = 0.5 + 0.5 * Math.sin(now * 0.0008 + p.phase);
         ctx!.globalAlpha = 0.12 + 0.28 * twinkle;
-        ctx!.fillStyle = p.accent ? accent : foreground;
+        ctx!.fillStyle = p.accent ? colors.current.spark : colors.current.dot;
         ctx!.beginPath();
         ctx!.arc(p.x * width, p.y * height, p.radius, 0, Math.PI * 2);
         ctx!.fill();
@@ -96,7 +98,7 @@ export default function BackgroundFx() {
 
     function restart() {
       cancelAnimationFrame(frame);
-      readColors();
+      colors.current = readColors();
       resize();
       last = performance.now();
       draw(last);
@@ -113,6 +115,19 @@ export default function BackgroundFx() {
       reduceMotion.removeEventListener("change", restart);
       colorScheme.removeEventListener("change", restart);
     };
+  }, []);
+
+  // A page can restyle the background through `data-theme` on <html>.
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      colors.current = readColors();
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (

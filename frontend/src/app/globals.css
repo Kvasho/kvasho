@@ -4,6 +4,51 @@
   --background: #ffffff;
   --foreground: #171717;
   --accent: #e1061b;
+
+  /* Colours of the animated background; pages can restyle it by overriding these. */
+  --bg-glow-a: var(--accent);
+  --bg-glow-b: #1557ff;
+  --bg-glow-c: #c00018;
+  --bg-spark: var(--accent);
+}
+
+/* Football-green background while the Guess footballers page is shown. */
+:root[data-theme="pitch"] {
+  --bg-glow-a: #1faa4b;
+  --bg-glow-b: #0f9d7a;
+  --bg-glow-c: #7bc62d;
+  --bg-spark: #22c55e;
+}
+
+/* That page swaps the line grid for a blurred pitch behind everything. */
+:root[data-theme="pitch"] .bg-grid-mask {
+  opacity: 0;
+}
+
+.pitch-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.4;
+  /* Scaled up so the soft blurred edges fall outside the screen. */
+  filter: blur(14px);
+  transform: scale(1.12);
+  animation: pitch-backdrop-in 1.2s ease-out both;
+}
+
+@keyframes pitch-backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Registered as a colour so the glows fade between page themes. */
+@property --blob {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
 }
 
 @theme inline {
@@ -33,7 +78,7 @@ body {
   -webkit-text-stroke: 1px color-mix(in srgb, var(--foreground) 35%, transparent);
 }
 
-/* Slow drifting red and blue glows behind the page. */
+/* Slow drifting colour glows behind the page. */
 .bg-blob {
   position: absolute;
   width: 60vmax;
@@ -42,6 +87,7 @@ body {
   background: radial-gradient(circle, var(--blob) 0%, transparent 65%);
   opacity: 0.32;
   will-change: transform;
+  transition: --blob 1.2s ease;
 }
 
 /* Faint line grid that fades out towards the edges and pans diagonally. */
@@ -49,6 +95,7 @@ body {
   position: absolute;
   inset: 0;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, black, transparent);
+  transition: opacity 1s ease;
 }
 
 .bg-grid {
@@ -77,28 +124,28 @@ body {
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--accent) 14%, transparent),
+    color-mix(in srgb, var(--bg-spark) 14%, transparent),
     transparent 65%
   );
   opacity: 0;
 }
 
 .bg-blob-a {
-  --blob: var(--accent);
+  --blob: var(--bg-glow-a);
   top: -25vmax;
   left: -15vmax;
   animation: blob-drift-a 38s ease-in-out infinite alternate;
 }
 
 .bg-blob-b {
-  --blob: #1557ff;
+  --blob: var(--bg-glow-b);
   top: 10vmax;
   right: -25vmax;
   animation: blob-drift-b 46s ease-in-out infinite alternate;
 }
 
 .bg-blob-c {
-  --blob: #c00018;
+  --blob: var(--bg-glow-c);
   bottom: -30vmax;
   left: 20vmax;
   animation: blob-drift-c 52s ease-in-out infinite alternate;
@@ -135,4 +182,33 @@ body {
     color-mix(in srgb, var(--accent) 22%, transparent),
     transparent 65%
   );
+}
+
+/* Guess footballers: guess result toast and end-of-game overlay. */
+.guess-notice {
+  animation: guess-notice-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes guess-notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.9);
+  }
+}
+
+.game-result {
+  animation: game-result-in 0.5s ease-out both;
+}
+
+@keyframes game-result-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Slim scrollbar for the match list on the Guess footballers page. */
+.match-list {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 20%, transparent)
+    transparent;
 }

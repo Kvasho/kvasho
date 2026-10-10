@@ -1,6 +1,14 @@
 "use client";
 
-import { useRef, type PointerEvent } from "react";
+import {
+  useRef,
+  type CSSProperties,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
+import Link from "next/link";
+import { useCurtain, type CurtainOptions } from "@/components/curtain";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -12,9 +20,25 @@ type WorkCardProps = {
   index: number;
   title: string;
   category: string;
+  href?: string;
+  /** Navigate to `href` behind a curtain set up like this. */
+  curtain?: CurtainOptions;
+  /** Decorative illustration filling the card behind its text. */
+  art?: ReactNode;
+  /** A colour this card glows in, replacing the site accent inside it. */
+  glow?: string;
 };
 
-export default function WorkCard({ index, title, category }: WorkCardProps) {
+export default function WorkCard({
+  index,
+  title,
+  category,
+  href,
+  curtain,
+  art,
+  glow,
+}: WorkCardProps) {
+  const navigate = useCurtain();
   const card = useRef<HTMLElement>(null);
   const rotateX = useRef<gsap.QuickToFunc>(null);
   const rotateY = useRef<gsap.QuickToFunc>(null);
@@ -50,13 +74,38 @@ export default function WorkCard({ index, title, category }: WorkCardProps) {
     rotateY.current?.(0);
   }
 
+  function handleClick(event: MouseEvent<HTMLAnchorElement>) {
+    if (!href || !curtain) return;
+    // Leave new-tab / new-window clicks to the browser.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    event.preventDefault();
+    navigate(href, curtain);
+  }
+
   return (
     <article
       ref={card}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      className="group relative flex aspect-[4/3] flex-col justify-between overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-6 backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-accent/50 hover:shadow-[0_24px_60px_-24px] hover:shadow-accent/40"
+      // Overriding --accent recolours every accent utility inside the card.
+      style={glow ? ({ "--accent": glow } as CSSProperties) : undefined}
+      className={`group relative flex aspect-4/3 flex-col justify-between overflow-hidden rounded-3xl border bg-foreground/3 p-6 backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-accent/50 hover:shadow-[0_24px_60px_-24px] hover:shadow-accent/40 ${
+        glow
+          ? "border-accent/30 shadow-[0_0_48px_-18px] shadow-accent/60"
+          : "border-foreground/10"
+      }`}
     >
+      {art && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-70 transition duration-700 ease-out group-hover:scale-105 group-hover:opacity-100"
+        >
+          {art}
+        </div>
+      )}
       <div
         aria-hidden
         className="work-card-spot pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -90,6 +139,15 @@ export default function WorkCard({ index, title, category }: WorkCardProps) {
         </h2>
         <span className="mt-4 block h-px origin-left scale-x-0 bg-accent transition-transform duration-500 group-hover:scale-x-100" />
       </div>
+
+      {href && (
+        <Link
+          href={href}
+          aria-label={title}
+          onClick={handleClick}
+          className="absolute inset-0"
+        />
+      )}
     </article>
   );
 }

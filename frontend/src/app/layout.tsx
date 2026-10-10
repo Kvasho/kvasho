@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Geist, Geist_Mono } from "next/font/google";
 import Background from "@/components/background";
+import CurtainProvider from "@/components/curtain";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,11 +28,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // Pages may set `data-theme` on <html> before hydration.
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Background />
-        {children}
+        <CurtainProvider>{children}</CurtainProvider>
       </body>
     </html>
   );
