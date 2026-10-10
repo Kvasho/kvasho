@@ -3,13 +3,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #e1061b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-anton);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +26,113 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.loader-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+
+/* Slow drifting red and blue glows behind the page. */
+.bg-blob {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--blob) 0%, transparent 65%);
+  opacity: 0.32;
+  will-change: transform;
+}
+
+/* Faint line grid that fades out towards the edges and pans diagonally. */
+.bg-grid-mask {
+  position: absolute;
+  inset: 0;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, black, transparent);
+}
+
+.bg-grid {
+  --line: color-mix(in srgb, var(--foreground) 7%, transparent);
+  position: absolute;
+  inset: -64px;
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  animation: grid-pan 30s linear infinite;
+}
+
+@keyframes grid-pan {
+  to {
+    transform: translate3d(64px, 64px, 0);
+  }
+}
+
+.bg-cursor-glow {
+  position: absolute;
+  top: -300px;
+  left: -300px;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+}
+
+.bg-blob-a {
+  --blob: var(--accent);
+  top: -25vmax;
+  left: -15vmax;
+  animation: blob-drift-a 38s ease-in-out infinite alternate;
+}
+
+.bg-blob-b {
+  --blob: #1557ff;
+  top: 10vmax;
+  right: -25vmax;
+  animation: blob-drift-b 46s ease-in-out infinite alternate;
+}
+
+.bg-blob-c {
+  --blob: #c00018;
+  bottom: -30vmax;
+  left: 20vmax;
+  animation: blob-drift-c 52s ease-in-out infinite alternate;
+}
+
+@keyframes blob-drift-a {
+  to {
+    transform: translate3d(18vmax, 12vmax, 0) scale(1.15);
+  }
+}
+
+@keyframes blob-drift-b {
+  to {
+    transform: translate3d(-20vmax, 10vmax, 0) scale(0.9);
+  }
+}
+
+@keyframes blob-drift-c {
+  to {
+    transform: translate3d(-12vmax, -16vmax, 0) scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-blob,
+  .bg-grid {
+    animation: none;
+  }
+}
+
+.work-card-spot {
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent 65%
+  );
 }
