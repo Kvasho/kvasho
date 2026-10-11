@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useI18n } from "@/i18n/provider";
 
 gsap.registerPlugin(useGSAP);
 
 export default function AboutPanel({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -84,7 +86,7 @@ export default function AboutPanel({ children }: { children: ReactNode }) {
         aria-expanded={open}
         className="group inline-flex cursor-pointer items-center gap-3 rounded-full border border-foreground/15 px-6 py-3 text-sm uppercase tracking-[0.2em] transition-colors duration-500 hover:border-accent hover:bg-accent hover:text-white"
       >
-        About me
+        {t.about.button}
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -102,9 +104,10 @@ export default function AboutPanel({ children }: { children: ReactNode }) {
         ref={panel}
         role="dialog"
         aria-modal="true"
-        aria-label="About me"
+        aria-label={t.about.button}
         inert={!open}
-        className="invisible fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-background"
+        // Above the language switcher (z-50), whose corner the close button shares.
+        className="invisible fixed inset-0 z-55 overflow-y-auto overscroll-contain bg-background"
       >
         {/* Sticky rather than fixed: the panel is transformed by GSAP. */}
         <div className="sticky top-6 z-10 flex h-0 justify-end px-6 sm:px-10">
@@ -112,7 +115,7 @@ export default function AboutPanel({ children }: { children: ReactNode }) {
             ref={closeButton}
             type="button"
             onClick={closePanel}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-foreground/15 bg-background/60 backdrop-blur-md transition-all duration-500 hover:rotate-90 hover:border-accent hover:bg-accent hover:text-white"
           >
             <svg

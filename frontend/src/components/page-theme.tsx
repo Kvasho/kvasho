@@ -3,7 +3,7 @@
 import { useLayoutEffect } from "react";
 
 /** Themes defined in globals.css as `:root[data-theme="…"]`. */
-type Theme = "pitch" | "mines" | "geo";
+type Theme = "pitch" | "mines" | "geo" | "invoicer";
 
 /**
  * Restyles the site (background, and for some themes the accent colour)

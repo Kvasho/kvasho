@@ -1,0 +1,8 @@
+{
+    "Unauthenticated.": "გთხოვთ, შეხვიდეთ სისტემაში.",
+    "This action is unauthorized.": "ამ მოქმედების უფლება არ გაქვთ.",
+    "Too Many Attempts.": "ძალიან ბევრი მცდელობა. ცოტა ხანში სცადეთ.",
+    "Not Found": "ვერ მოიძებნა.",
+    "Server Error": "სერვერის შეცდომა.",
+    "You do not belong to any company.": "თქვენ არცერთ კომპანიას არ ეკუთვნით."
+}

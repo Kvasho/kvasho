@@ -2,8 +2,10 @@
 
 import {
   createContext,
+  Suspense,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
   type ReactNode,
@@ -39,9 +41,19 @@ export function useCurtain() {
   return useContext(CurtainContext);
 }
 
+/**
+ * Reports the current path. On dynamic routes the path is runtime data, so
+ * it is read here under Suspense rather than in the provider wrapping every page.
+ */
+function PathnameReporter({ onChange }: { onChange: (pathname: string) => void }) {
+  const pathname = usePathname();
+  useEffect(() => onChange(pathname), [pathname, onChange]);
+  return null;
+}
+
 export default function CurtainProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState<string | null>(null);
   const [transition, setTransition] = useState<Transition | null>(null);
   const curtain = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -109,6 +121,9 @@ export default function CurtainProvider({ children }: { children: ReactNode }) {
 
   return (
     <CurtainContext value={navigate}>
+      <Suspense fallback={null}>
+        <PathnameReporter onChange={setPathname} />
+      </Suspense>
       {children}
       {transition && (
         <div
